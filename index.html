@@ -19,6 +19,20 @@ body{
     padding:20px;
 }
 
+.language{
+    position:absolute;
+    top:20px;
+    right:20px;
+}
+
+.language button{
+    margin-left:8px;
+    padding:8px 12px;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+}
+
 .container{
     max-width:700px;
 }
@@ -49,7 +63,6 @@ h1{
     background:#1e293b;
     color:white;
     text-decoration:none;
-    transition:0.2s;
 }
 
 .links a:hover{
@@ -66,25 +79,51 @@ h1{
 </head>
 
 <body>
+
+<div class="language">
+<button onclick="setLanguage('en')">🇺🇸 EN</button>
+<button onclick="setLanguage('pt')">🇧🇷 PT</button>
+</div>
+
 <div class="container">
 
 <h1>Tiago Barbosa</h1>
 
-<p class="subtitle">.NET Developer</p>
+<p class="subtitle" id="role"></p>
 
-<p class="description">
-Backend developer focused on APIs, clean architecture, scalable systems and business solutions using C#, ASP.NET Core and SQL Server.
-</p>
+<p class="description" id="description"></p>
 
 <div class="links">
 <a href="https://github.com/TiagoBarbosaMayaman" target="_blank">GitHub</a>
 <a href="https://www.linkedin.com/in/tiago-barbosa-nascimento/" target="_blank">LinkedIn</a>
 </div>
 
-<p class="stack">
-C# • ASP.NET Core • SQL Server • REST APIs • Clean Code • Git
-</p>
+<p class="stack" id="stack"></p>
 
 </div>
+
+<script>
+const content = {
+  en: {
+    role: ".NET Developer",
+    description: "Backend developer focused on APIs, clean architecture, scalable systems and business solutions using C#, ASP.NET Core and SQL Server.",
+    stack: "C# • ASP.NET Core • SQL Server • REST APIs • Clean Code • Git"
+  },
+  pt: {
+    role: "Desenvolvedor .NET",
+    description: "Desenvolvedor backend focado em APIs, arquitetura limpa, sistemas escaláveis e soluções de negócio usando C#, ASP.NET Core e SQL Server.",
+    stack: "C# • ASP.NET Core • SQL Server • APIs REST • Clean Code • Git"
+  }
+};
+
+function setLanguage(lang){
+  document.getElementById("role").innerText = content[lang].role;
+  document.getElementById("description").innerText = content[lang].description;
+  document.getElementById("stack").innerText = content[lang].stack;
+}
+
+setLanguage('en');
+</script>
+
 </body>
 </html>
