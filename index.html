@@ -31,6 +31,13 @@ body{
     border:none;
     border-radius:6px;
     cursor:pointer;
+    background:#1e293b;
+    color:white;
+}
+
+.language button:hover{
+    background:#38bdf8;
+    color:#0f172a;
 }
 
 .container{
@@ -86,11 +93,16 @@ h1{
 </div>
 
 <div class="container">
+<h1>Tiago Barbosa</h1>
+<p class="subtitle" id="role"></p>
+<p class="description" id="description"></p>
 
+<div class="links">
+<a href="https://github.com/TiagoBarbosaMayaman" target="_blank">GitHub</a>
+<a href="https://www.linkedin.com/in/tiago-barbosa-nascimento/" target="_blank">LinkedIn</a>
 </div>
 
 <p class="stack" id="stack"></p>
-
 </div>
 
 <script>
@@ -108,12 +120,12 @@ const content = {
 };
 
 function setLanguage(lang){
-  document.getElementById("role").innerText = content[lang].role;
-  document.getElementById("description").innerText = content[lang].description;
-  document.getElementById("stack").innerText = content[lang].stack;
+    document.getElementById("role").innerText = content[lang].role;
+    document.getElementById("description").innerText = content[lang].description;
+    document.getElementById("stack").innerText = content[lang].stack;
 }
 
-setLanguage('en');
+setLanguage("en");
 </script>
 
 </body>
