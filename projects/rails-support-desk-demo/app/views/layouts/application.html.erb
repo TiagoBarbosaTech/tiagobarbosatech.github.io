@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Rails Support Desk Demo</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <style>
+      body { margin: 0; font-family: Arial, sans-serif; background: #f8fafc; color: #0f172a; }
+      .page { width: min(980px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0; }
+      .topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 28px; }
+      a, button, input[type="submit"] { font: inherit; }
+      a { color: #0369a1; }
+      .button, input[type="submit"] { display: inline-block; border: 0; border-radius: 6px; background: #0f172a; color: white; padding: 10px 14px; text-decoration: none; cursor: pointer; }
+      .button.secondary { background: #e2e8f0; color: #0f172a; }
+      .notice { background: #dcfce7; color: #166534; padding: 12px 14px; border-radius: 6px; margin-bottom: 18px; }
+      .card { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px; margin-bottom: 14px; }
+      .meta { color: #64748b; font-size: 14px; }
+      .tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+      .tag { background: #e0f2fe; color: #075985; border-radius: 999px; padding: 5px 9px; font-size: 13px; }
+      label { display: block; font-weight: 700; margin: 14px 0 6px; }
+      input, select, textarea { width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px; }
+      textarea { min-height: 140px; }
+      .errors { background: #fee2e2; color: #991b1b; padding: 12px 14px; border-radius: 6px; }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <% if notice.present? %>
+        <div class="notice"><%= notice %></div>
+      <% end %>
+      <%= yield %>
+    </main>
+  </body>
+</html>

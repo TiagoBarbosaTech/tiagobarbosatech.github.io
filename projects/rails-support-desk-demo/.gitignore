@@ -1,0 +1,6 @@
+/.bundle
+/log/*
+/tmp/*
+/storage/*
+/db/*.sqlite3
+/db/*.sqlite3-*

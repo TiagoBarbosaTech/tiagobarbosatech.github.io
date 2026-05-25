@@ -1,0 +1,18 @@
+<div class="topbar">
+  <div>
+    <h1><%= @ticket.title %></h1>
+    <p class="meta"><%= @ticket.customer_email %></p>
+  </div>
+  <%= link_to "Back", tickets_path, class: "button secondary" %>
+</div>
+
+<div class="card">
+  <div class="tags">
+    <span class="tag"><%= @ticket.status.humanize %></span>
+    <span class="tag"><%= @ticket.priority.humanize %></span>
+  </div>
+  <p><%= simple_format(@ticket.description) %></p>
+</div>
+
+<%= link_to "Edit", edit_ticket_path(@ticket), class: "button" %>
+<%= button_to "Delete", @ticket, method: :delete, class: "button secondary" %>

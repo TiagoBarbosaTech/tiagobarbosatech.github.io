@@ -1,0 +1,30 @@
+<div class="topbar">
+  <div>
+    <h1>Support tickets</h1>
+    <p class="meta">Small Rails CRUD demo for support operations.</p>
+  </div>
+  <%= link_to "New ticket", new_ticket_path, class: "button" %>
+</div>
+
+<p>
+  <%= link_to "All", tickets_path %>
+  <% Ticket::STATUSES.each do |status| %>
+    | <%= link_to status.humanize, tickets_path(status: status) %>
+  <% end %>
+</p>
+
+<% @tickets.each do |ticket| %>
+  <article class="card">
+    <h2><%= link_to ticket.title, ticket %></h2>
+    <p class="meta"><%= ticket.customer_email %></p>
+    <div class="tags">
+      <span class="tag"><%= ticket.status.humanize %></span>
+      <span class="tag"><%= ticket.priority.humanize %></span>
+    </div>
+    <p><%= truncate(ticket.description, length: 150) %></p>
+  </article>
+<% end %>
+
+<% if @tickets.empty? %>
+  <div class="card">No tickets found.</div>
+<% end %>
