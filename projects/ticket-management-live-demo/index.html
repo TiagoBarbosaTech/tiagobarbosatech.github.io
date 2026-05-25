@@ -51,11 +51,16 @@ a {
 
 .app {
     min-height: 100vh;
-    display: grid;
-    grid-template-columns: 270px minmax(0, 1fr);
+    padding-left: 270px;
 }
 
 .sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: 270px;
+    height: 100vh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
     background: #0f172a;
     color: white;
     padding: 22px;
@@ -502,11 +507,14 @@ textarea {
 
 @media (max-width: 960px) {
     .app {
-        grid-template-columns: 1fr;
+        padding-left: 0;
     }
 
     .sidebar {
         position: static;
+        width: auto;
+        height: auto;
+        overflow: visible;
     }
 
     .sidebar-nav {
