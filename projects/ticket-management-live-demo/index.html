@@ -4,19 +4,26 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ticket Management Live Demo</title>
-<meta name="description" content="A static browser demo of a Rails support ticket CRUD workflow.">
+<meta name="description" content="A polished browser demo of a ticket management CRUD workflow.">
 <style>
 :root {
-    --bg: #f8fafc;
+    --bg: #f5f7fb;
     --surface: #ffffff;
+    --surface-soft: #f8fafc;
     --surface-strong: #e2e8f0;
     --text: #0f172a;
     --muted: #64748b;
+    --line: #d7dee8;
     --accent: #0369a1;
     --accent-strong: #075985;
-    --line: #cbd5e1;
-    --danger: #b91c1c;
-    --success: #166534;
+    --green: #15803d;
+    --amber: #b45309;
+    --red: #b91c1c;
+    --blue-soft: #e0f2fe;
+    --green-soft: #dcfce7;
+    --amber-soft: #fef3c7;
+    --red-soft: #fee2e2;
+    --shadow: 0 16px 45px rgba(15, 23, 42, 0.09);
 }
 
 * {
@@ -37,48 +44,118 @@ textarea {
     font: inherit;
 }
 
-.page {
-    width: min(1120px, calc(100% - 32px));
-    margin: 0 auto;
-    padding: 28px 0 46px;
+button,
+a {
+    -webkit-tap-highlight-color: transparent;
 }
 
-.topbar {
+.app {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 270px minmax(0, 1fr);
+}
+
+.sidebar {
+    background: #0f172a;
+    color: white;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+}
+
+.brand {
+    display: grid;
+    gap: 6px;
+}
+
+.brand-mark {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    border-radius: 8px;
+    background: #38bdf8;
+    color: #0f172a;
+    font-weight: 800;
+}
+
+.brand strong {
+    font-size: 18px;
+}
+
+.brand span,
+.sidebar-label {
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+.back-link {
+    color: #bae6fd;
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.sidebar-nav {
+    display: grid;
+    gap: 8px;
+}
+
+.nav-button {
+    width: 100%;
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    gap: 16px;
-    margin-bottom: 26px;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 8px;
+    padding: 10px 12px;
+    background: transparent;
+    color: white;
+    cursor: pointer;
+    text-align: left;
 }
 
-.top-actions {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
+.nav-button.active,
+.nav-button:hover {
+    background: rgba(56, 189, 248, 0.14);
+    border-color: rgba(56, 189, 248, 0.45);
+}
+
+.nav-count {
+    min-width: 28px;
+    text-align: center;
+    border-radius: 999px;
+    padding: 3px 8px;
+    background: rgba(148, 163, 184, 0.2);
+    color: #e2e8f0;
+    font-size: 12px;
 }
 
 .language {
     display: flex;
     gap: 8px;
+    margin-top: auto;
 }
 
 .language button {
+    flex: 1;
     display: inline-flex;
+    justify-content: center;
     align-items: center;
     gap: 7px;
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    padding: 9px 11px;
-    background: var(--surface);
-    color: var(--text);
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    border-radius: 8px;
+    padding: 9px;
+    background: transparent;
+    color: white;
     cursor: pointer;
 }
 
 .language button.active {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: white;
+    background: #38bdf8;
+    border-color: #38bdf8;
+    color: #0f172a;
 }
 
 .language img {
@@ -86,60 +163,67 @@ textarea {
     height: auto;
 }
 
-.back {
+.main {
+    min-width: 0;
+    padding: 26px;
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 18px;
+    margin-bottom: 22px;
+}
+
+.eyebrow {
+    margin: 0 0 8px;
     color: var(--accent);
-    text-decoration: none;
     font-weight: 700;
+    font-size: 14px;
 }
 
 h1 {
-    font-size: clamp(34px, 6vw, 56px);
-    margin: 10px 0 8px;
+    font-size: clamp(32px, 5vw, 52px);
+    line-height: 1;
+    margin: 0 0 12px;
 }
 
 .subtitle {
-    color: var(--muted);
-    font-size: 18px;
-    line-height: 1.5;
-    max-width: 760px;
+    max-width: 780px;
     margin: 0;
+    color: var(--muted);
+    line-height: 1.55;
+    font-size: 17px;
 }
 
-.toolbar,
-.panel,
-.ticket {
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 8px;
-}
-
-.toolbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 14px;
-    padding: 14px;
-    margin: 28px 0 16px;
-}
-
-.filters {
+.top-actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    justify-content: flex-end;
+    gap: 10px;
 }
 
-.filter,
-.button {
+.button,
+.icon-button {
     border: 1px solid var(--line);
-    border-radius: 6px;
-    padding: 10px 13px;
+    border-radius: 8px;
     background: var(--surface);
     color: var(--text);
     cursor: pointer;
     text-decoration: none;
 }
 
-.filter.active,
+.button {
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 14px;
+    font-weight: 700;
+}
+
 .button.primary {
     background: var(--accent);
     border-color: var(--accent);
@@ -147,14 +231,78 @@ h1 {
 }
 
 .button.danger {
-    color: var(--danger);
+    color: var(--red);
 }
 
-.layout {
+.button:hover,
+.icon-button:hover {
+    border-color: var(--accent);
+}
+
+.stats {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 360px;
-    gap: 18px;
-    align-items: start;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.stat {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.stat span {
+    display: block;
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 10px;
+}
+
+.stat strong {
+    display: block;
+    font-size: 30px;
+}
+
+.workbench {
+    display: grid;
+    gap: 16px;
+}
+
+.controls {
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) 190px 190px;
+    gap: 12px;
+    align-items: end;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 14px;
+}
+
+.field label {
+    display: block;
+    margin: 0 0 6px;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 11px 12px;
+    background: white;
+    color: var(--text);
+}
+
+textarea {
+    min-height: 130px;
+    resize: vertical;
 }
 
 .tickets {
@@ -163,175 +311,347 @@ h1 {
 }
 
 .ticket {
-    padding: 18px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+    align-items: start;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 16px;
 }
 
-.ticket-header {
-    display: flex;
-    justify-content: space-between;
-    gap: 16px;
+.ticket:hover {
+    box-shadow: var(--shadow);
 }
 
 .ticket h2 {
-    font-size: 20px;
     margin: 0 0 6px;
+    font-size: 19px;
 }
 
-.muted {
+.ticket p {
+    margin: 10px 0 0;
     color: var(--muted);
+    line-height: 1.5;
 }
 
-.tags {
+.ticket-meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    margin: 12px 0;
-}
-
-.tag {
-    background: #e0f2fe;
-    color: var(--accent-strong);
-    border-radius: 999px;
-    padding: 5px 9px;
+    gap: 8px 12px;
+    color: var(--muted);
     font-size: 13px;
 }
 
-.actions {
+.badges,
+.ticket-actions {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    margin-top: 14px;
 }
 
-.panel {
-    padding: 18px;
-    position: sticky;
-    top: 16px;
+.ticket-actions {
+    justify-content: flex-end;
 }
 
-.panel h2 {
-    margin: 0 0 12px;
-    font-size: 22px;
-}
-
-label {
-    display: block;
+.badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    border-radius: 999px;
+    padding: 5px 10px;
+    font-size: 13px;
     font-weight: 700;
-    margin: 13px 0 6px;
 }
 
-input,
-select,
-textarea {
-    width: 100%;
+.status-open,
+.priority-low {
+    background: var(--blue-soft);
+    color: var(--accent-strong);
+}
+
+.status-in_progress,
+.priority-normal {
+    background: var(--amber-soft);
+    color: var(--amber);
+}
+
+.status-resolved {
+    background: var(--green-soft);
+    color: var(--green);
+}
+
+.status-closed {
+    background: var(--surface-strong);
+    color: #475569;
+}
+
+.priority-high {
+    background: #ffedd5;
+    color: #c2410c;
+}
+
+.priority-urgent {
+    background: var(--red-soft);
+    color: var(--red);
+}
+
+.icon-button {
+    width: 38px;
+    height: 38px;
+    display: grid;
+    place-items: center;
+}
+
+.empty {
+    background: var(--surface);
     border: 1px solid var(--line);
-    border-radius: 6px;
-    padding: 10px;
-    background: white;
-    color: var(--text);
-}
-
-textarea {
-    min-height: 132px;
-    resize: vertical;
+    border-radius: 8px;
+    padding: 36px 20px;
+    text-align: center;
+    color: var(--muted);
 }
 
 .notice {
+    position: fixed;
+    right: 22px;
+    bottom: 22px;
     display: none;
-    margin: 0 0 16px;
     padding: 12px 14px;
-    border-radius: 6px;
-    background: #dcfce7;
-    color: var(--success);
+    border-radius: 8px;
+    background: var(--green-soft);
+    color: var(--green);
+    border: 1px solid #bbf7d0;
+    box-shadow: var(--shadow);
+    z-index: 20;
 }
 
 .notice.show {
     display: block;
 }
 
-.empty {
-    padding: 28px;
-    text-align: center;
+.modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    place-items: center;
+    padding: 20px;
+    background: rgba(15, 23, 42, 0.48);
+    z-index: 30;
 }
 
-@media (max-width: 850px) {
-    .topbar,
-    .toolbar,
-    .ticket-header {
-        flex-direction: column;
-    }
+.modal.open {
+    display: grid;
+}
 
-    .layout {
+.dialog {
+    width: min(560px, 100%);
+    max-height: min(760px, calc(100vh - 40px));
+    overflow: auto;
+    background: var(--surface);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--line);
+    padding: 18px;
+}
+
+.dialog-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.dialog h2 {
+    margin: 0;
+    font-size: 23px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.field.full {
+    grid-column: 1 / -1;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+@media (max-width: 960px) {
+    .app {
         grid-template-columns: 1fr;
     }
 
-    .panel {
+    .sidebar {
         position: static;
+    }
+
+    .sidebar-nav {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .language {
+        margin-top: 0;
+        max-width: 220px;
+    }
+
+    .stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .controls {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .main {
+        padding: 18px;
+    }
+
+    .topbar,
+    .ticket {
+        grid-template-columns: 1fr;
+        display: grid;
+    }
+
+    .top-actions,
+    .ticket-actions {
+        justify-content: stretch;
+    }
+
+    .top-actions .button,
+    .ticket-actions .button {
+        width: 100%;
+    }
+
+    .stats,
+    .sidebar-nav,
+    .form-grid {
+        grid-template-columns: 1fr;
     }
 }
 </style>
 </head>
 <body>
-<main class="page">
-    <header class="topbar">
+<div class="app">
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-mark">TM</div>
+            <strong id="app-name">Ticket Manager</strong>
+            <span id="app-caption">Live portfolio demo</span>
+        </div>
+
+        <a class="back-link" href="../../" id="back-link">Back to portfolio</a>
+
         <div>
-            <a class="back" href="../../" id="back-link">Back to portfolio</a>
-            <h1 id="page-title">Ticket Management Live Demo</h1>
-            <p class="subtitle" id="subtitle">A working browser version of the Rails CRUD project. Add tickets, edit status or priority, filter the queue and delete records. Data is saved locally in this browser.</p>
+            <div class="sidebar-label" id="queue-label">Queues</div>
+            <nav class="sidebar-nav" id="filters" aria-label="Ticket queues"></nav>
         </div>
-        <div class="top-actions">
-            <div class="language" aria-label="Language">
-                <button type="button" id="lang-en">
-                    <img src="https://flagcdn.com/w20/us.png" alt="">
-                    EN
-                </button>
-                <button type="button" id="lang-pt">
-                    <img src="https://flagcdn.com/w20/br.png" alt="">
-                    PT
-                </button>
+
+        <div class="language" aria-label="Language">
+            <button type="button" id="lang-en">
+                <img src="https://flagcdn.com/w20/us.png" alt="">
+                EN
+            </button>
+            <button type="button" id="lang-pt">
+                <img src="https://flagcdn.com/w20/br.png" alt="">
+                PT
+            </button>
+        </div>
+    </aside>
+
+    <main class="main">
+        <header class="topbar">
+            <div>
+                <p class="eyebrow" id="eyebrow">Support operations</p>
+                <h1 id="page-title">Ticket Management Live Demo</h1>
+                <p class="subtitle" id="subtitle">A polished browser version of a Rails CRUD project. Search, sort, create, edit, filter and delete support tickets while data stays local to this browser.</p>
             </div>
-            <a class="button" href="https://github.com/tiagobarbosatech/tiagobarbosatech.github.io/tree/main/projects/ticket-management-live-demo" target="_blank" rel="noreferrer" id="source-link">Source code</a>
-        </div>
-    </header>
+            <div class="top-actions">
+                <a class="button" href="https://github.com/tiagobarbosatech/tiagobarbosatech.github.io/tree/main/projects/ticket-management-live-demo" target="_blank" rel="noreferrer" id="source-link">Source code</a>
+                <button class="button" type="button" id="reset-button">Reset demo data</button>
+                <button class="button primary" type="button" id="new-ticket-button">New ticket</button>
+            </div>
+        </header>
 
-    <div class="notice" id="notice"></div>
+        <section class="stats" id="stats" aria-label="Ticket summary"></section>
 
-    <section class="toolbar" aria-label="Ticket filters">
-        <div class="filters" id="filters"></div>
-        <button class="button" type="button" id="reset-button">Reset demo data</button>
-    </section>
-
-    <section class="layout">
-        <div class="tickets" id="tickets"></div>
-
-        <aside class="panel" aria-labelledby="form-title">
-            <h2 id="form-title">New ticket</h2>
-            <form id="ticket-form">
-                <input type="hidden" id="ticket-id">
-
-                <label for="title" id="title-label">Title</label>
-                <input id="title" required maxlength="90">
-
-                <label for="customer-email" id="email-label">Customer email</label>
-                <input id="customer-email" type="email" required>
-
-                <label for="priority" id="priority-label">Priority</label>
-                <select id="priority" required></select>
-
-                <label for="status" id="status-label">Status</label>
-                <select id="status" required></select>
-
-                <label for="description" id="description-label">Description</label>
-                <textarea id="description" required></textarea>
-
-                <div class="actions">
-                    <button class="button primary" type="submit" id="save-button">Create ticket</button>
-                    <button class="button" type="button" id="cancel-button">Cancel</button>
+        <section class="workbench" aria-label="Ticket workspace">
+            <div class="controls">
+                <div class="field">
+                    <label for="search" id="search-label">Search</label>
+                    <input id="search" type="search" autocomplete="off">
                 </div>
-            </form>
-        </aside>
-    </section>
-</main>
+                <div class="field">
+                    <label for="priority-filter" id="priority-filter-label">Priority</label>
+                    <select id="priority-filter"></select>
+                </div>
+                <div class="field">
+                    <label for="sort" id="sort-label">Sort</label>
+                    <select id="sort"></select>
+                </div>
+            </div>
+
+            <div class="tickets" id="tickets"></div>
+        </section>
+    </main>
+</div>
+
+<div class="notice" id="notice"></div>
+
+<div class="modal" id="ticket-modal" role="dialog" aria-modal="true" aria-labelledby="form-title">
+    <div class="dialog">
+        <div class="dialog-header">
+            <h2 id="form-title">New ticket</h2>
+            <button class="icon-button" type="button" id="close-modal" aria-label="Close">X</button>
+        </div>
+
+        <form id="ticket-form">
+            <input type="hidden" id="ticket-id">
+            <div class="form-grid">
+                <div class="field full">
+                    <label for="title" id="title-label">Title</label>
+                    <input id="title" required maxlength="90">
+                </div>
+
+                <div class="field">
+                    <label for="customer-email" id="email-label">Customer email</label>
+                    <input id="customer-email" type="email" required>
+                </div>
+
+                <div class="field">
+                    <label for="priority" id="priority-label">Priority</label>
+                    <select id="priority" required></select>
+                </div>
+
+                <div class="field">
+                    <label for="status" id="status-label">Status</label>
+                    <select id="status" required></select>
+                </div>
+
+                <div class="field full">
+                    <label for="description" id="description-label">Description</label>
+                    <textarea id="description" required></textarea>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button class="button" type="button" id="cancel-button">Cancel</button>
+                <button class="button primary" type="submit" id="save-button">Create ticket</button>
+            </div>
+        </form>
+    </div>
+</div>
 
 <script>
 const STORAGE_KEY = "ticket-management-live-demo:tickets";
@@ -339,6 +659,9 @@ const LANGUAGE_KEY = "ticket-management-live-demo:language";
 const statuses = ["open", "in_progress", "resolved", "closed"];
 const priorities = ["low", "normal", "high", "urgent"];
 let currentFilter = "all";
+let currentPriority = "all";
+let currentSort = "newest";
+let currentSearch = "";
 let currentLanguage = localStorage.getItem(LANGUAGE_KEY) || "en";
 
 const seedTickets = [
@@ -377,19 +700,31 @@ const seedTickets = [
 const content = {
     en: {
         documentTitle: "Ticket Management Live Demo",
+        appName: "Ticket Manager",
+        appCaption: "Live portfolio demo",
         back: "Back to portfolio",
+        queueLabel: "Queues",
+        eyebrow: "Support operations",
         title: "Ticket Management Live Demo",
-        subtitle: "A working browser version of the Rails CRUD project. Add tickets, edit status or priority, filter the queue and delete records. Data is saved locally in this browser.",
+        subtitle: "A polished browser version of a Rails CRUD project. Search, sort, create, edit, filter and delete support tickets while data stays local to this browser.",
         source: "Source code",
         reset: "Reset demo data",
+        newTicket: "New ticket",
         formNew: "New ticket",
         formEdit: "Edit ticket",
+        close: "Close",
         labels: {
             title: "Title",
             email: "Customer email",
             priority: "Priority",
             status: "Status",
-            description: "Description"
+            description: "Description",
+            search: "Search",
+            priorityFilter: "Priority",
+            sort: "Sort"
+        },
+        placeholders: {
+            search: "Search title, email or description"
         },
         buttons: {
             create: "Create ticket",
@@ -399,7 +734,13 @@ const content = {
             delete: "Delete"
         },
         filters: {
-            all: "All"
+            all: "All tickets"
+        },
+        stats: {
+            open: "Open",
+            in_progress: "In progress",
+            resolved: "Resolved",
+            urgent: "Urgent"
         },
         statuses: {
             open: "Open",
@@ -408,10 +749,17 @@ const content = {
             closed: "Closed"
         },
         priorities: {
+            all: "All priorities",
             low: "Low",
             normal: "Normal",
             high: "High",
             urgent: "Urgent"
+        },
+        sort: {
+            newest: "Newest first",
+            oldest: "Oldest first",
+            priority: "Priority: highest first",
+            status: "Status"
         },
         notices: {
             created: "Ticket created.",
@@ -419,7 +767,10 @@ const content = {
             deleted: "Ticket deleted.",
             restored: "Demo data restored."
         },
-        empty: "No tickets found for this filter.",
+        empty: {
+            title: "No tickets match this view.",
+            body: "Try another queue, priority, search term or reset the demo data."
+        },
         seeds: {
             exportLeads: {
                 title: "Customer cannot export leads",
@@ -437,19 +788,31 @@ const content = {
     },
     pt: {
         documentTitle: "Demo de Gerenciamento de Tickets",
+        appName: "Gerenciador de Tickets",
+        appCaption: "Demo ao vivo do portfólio",
         back: "Voltar ao portfólio",
+        queueLabel: "Filas",
+        eyebrow: "Operações de suporte",
         title: "Demo de Gerenciamento de Tickets",
-        subtitle: "Uma versão funcional no navegador do projeto CRUD em Rails. Crie tickets, edite status ou prioridade, filtre a fila e exclua registros. Os dados ficam salvos localmente neste navegador.",
+        subtitle: "Uma versão polida no navegador de um projeto CRUD em Rails. Pesquise, ordene, crie, edite, filtre e exclua tickets de suporte com dados salvos localmente neste navegador.",
         source: "Código fonte",
-        reset: "Restaurar dados da demo",
+        reset: "Restaurar dados",
+        newTicket: "Novo ticket",
         formNew: "Novo ticket",
         formEdit: "Editar ticket",
+        close: "Fechar",
         labels: {
             title: "Título",
             email: "E-mail do cliente",
             priority: "Prioridade",
             status: "Status",
-            description: "Descrição"
+            description: "Descrição",
+            search: "Pesquisar",
+            priorityFilter: "Prioridade",
+            sort: "Ordenar"
+        },
+        placeholders: {
+            search: "Pesquisar título, e-mail ou descrição"
         },
         buttons: {
             create: "Criar ticket",
@@ -459,7 +822,13 @@ const content = {
             delete: "Excluir"
         },
         filters: {
-            all: "Todos"
+            all: "Todos os tickets"
+        },
+        stats: {
+            open: "Abertos",
+            in_progress: "Em andamento",
+            resolved: "Resolvidos",
+            urgent: "Urgentes"
         },
         statuses: {
             open: "Aberto",
@@ -468,10 +837,17 @@ const content = {
             closed: "Fechado"
         },
         priorities: {
+            all: "Todas as prioridades",
             low: "Baixa",
             normal: "Normal",
             high: "Alta",
             urgent: "Urgente"
+        },
+        sort: {
+            newest: "Mais recentes primeiro",
+            oldest: "Mais antigos primeiro",
+            priority: "Prioridade: maior primeiro",
+            status: "Status"
         },
         notices: {
             created: "Ticket criado.",
@@ -479,7 +855,10 @@ const content = {
             deleted: "Ticket excluído.",
             restored: "Dados da demo restaurados."
         },
-        empty: "Nenhum ticket encontrado para este filtro.",
+        empty: {
+            title: "Nenhum ticket corresponde a esta visão.",
+            body: "Tente outra fila, prioridade, termo de pesquisa ou restaure os dados da demo."
+        },
         seeds: {
             exportLeads: {
                 title: "Cliente não consegue exportar leads",
@@ -497,8 +876,12 @@ const content = {
     }
 };
 
+function t() {
+    return content[currentLanguage];
+}
+
 function translateValue(group, value) {
-    return content[currentLanguage][group][value] || value;
+    return t()[group][value] || value;
 }
 
 function escapeHtml(value) {
@@ -511,11 +894,11 @@ function escapeHtml(value) {
 }
 
 function ticketTitle(ticket) {
-    return ticket.seedKey ? content[currentLanguage].seeds[ticket.seedKey].title : ticket.title;
+    return ticket.seedKey ? t().seeds[ticket.seedKey].title : ticket.title;
 }
 
 function ticketDescription(ticket) {
-    return ticket.seedKey ? content[currentLanguage].seeds[ticket.seedKey].description : ticket.description;
+    return ticket.seedKey ? t().seeds[ticket.seedKey].description : ticket.description;
 }
 
 function getTickets() {
@@ -545,84 +928,171 @@ function showNotice(message) {
     window.setTimeout(() => notice.classList.remove("show"), 2200);
 }
 
+function counts() {
+    const tickets = getTickets();
+    return {
+        all: tickets.length,
+        open: tickets.filter((ticket) => ticket.status === "open").length,
+        in_progress: tickets.filter((ticket) => ticket.status === "in_progress").length,
+        resolved: tickets.filter((ticket) => ticket.status === "resolved").length,
+        closed: tickets.filter((ticket) => ticket.status === "closed").length,
+        urgent: tickets.filter((ticket) => ticket.priority === "urgent").length
+    };
+}
+
+function priorityRank(priority) {
+    return { urgent: 4, high: 3, normal: 2, low: 1 }[priority] || 0;
+}
+
+function filteredTickets() {
+    const query = currentSearch.trim().toLowerCase();
+    return getTickets()
+        .filter((ticket) => currentFilter === "all" || ticket.status === currentFilter)
+        .filter((ticket) => currentPriority === "all" || ticket.priority === currentPriority)
+        .filter((ticket) => {
+            if (!query) return true;
+            return [
+                ticketTitle(ticket),
+                ticket.customerEmail,
+                ticketDescription(ticket)
+            ].join(" ").toLowerCase().includes(query);
+        })
+        .sort((a, b) => {
+            if (currentSort === "oldest") return new Date(a.createdAt) - new Date(b.createdAt);
+            if (currentSort === "priority") return priorityRank(b.priority) - priorityRank(a.priority);
+            if (currentSort === "status") return statuses.indexOf(a.status) - statuses.indexOf(b.status);
+            return new Date(b.createdAt) - new Date(a.createdAt);
+        });
+}
+
 function renderSelectOptions() {
     const statusSelect = document.getElementById("status");
     const prioritySelect = document.getElementById("priority");
+    const priorityFilter = document.getElementById("priority-filter");
+    const sortSelect = document.getElementById("sort");
+
     statusSelect.innerHTML = statuses.map((status) => `<option value="${status}">${translateValue("statuses", status)}</option>`).join("");
     prioritySelect.innerHTML = priorities.map((priority) => `<option value="${priority}">${translateValue("priorities", priority)}</option>`).join("");
+    priorityFilter.innerHTML = ["all", ...priorities].map((priority) => `<option value="${priority}">${translateValue("priorities", priority)}</option>`).join("");
+    sortSelect.innerHTML = Object.keys(t().sort).map((sort) => `<option value="${sort}">${t().sort[sort]}</option>`).join("");
+
+    priorityFilter.value = currentPriority;
+    sortSelect.value = currentSort;
 }
 
 function renderFilters() {
+    const filterCounts = counts();
     const filters = document.getElementById("filters");
     const values = ["all", ...statuses];
     filters.innerHTML = values.map((value) => {
-        const label = value === "all" ? content[currentLanguage].filters.all : translateValue("statuses", value);
+        const label = value === "all" ? t().filters.all : translateValue("statuses", value);
         const active = value === currentFilter ? " active" : "";
-        return `<button class="filter${active}" type="button" data-filter="${value}">${label}</button>`;
+        return `<button class="nav-button${active}" type="button" data-filter="${value}">
+            <span>${label}</span>
+            <span class="nav-count">${filterCounts[value]}</span>
+        </button>`;
     }).join("");
+}
+
+function renderStats() {
+    const ticketCounts = counts();
+    const stats = [
+        ["open", ticketCounts.open],
+        ["in_progress", ticketCounts.in_progress],
+        ["resolved", ticketCounts.resolved],
+        ["urgent", ticketCounts.urgent]
+    ];
+    document.getElementById("stats").innerHTML = stats.map(([key, value]) => `
+        <article class="stat">
+            <span>${t().stats[key]}</span>
+            <strong>${value}</strong>
+        </article>
+    `).join("");
 }
 
 function renderTickets() {
     const container = document.getElementById("tickets");
-    const tickets = getTickets()
-        .filter((ticket) => currentFilter === "all" || ticket.status === currentFilter)
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    const tickets = filteredTickets();
 
     if (tickets.length === 0) {
-        container.innerHTML = `<div class="ticket empty">${content[currentLanguage].empty}</div>`;
+        container.innerHTML = `
+            <div class="empty">
+                <strong>${t().empty.title}</strong>
+                <p>${t().empty.body}</p>
+            </div>`;
         return;
     }
 
     container.innerHTML = tickets.map((ticket) => `
         <article class="ticket">
-            <div class="ticket-header">
-                <div>
-                    <h2>${escapeHtml(ticketTitle(ticket))}</h2>
-                    <div class="muted">${escapeHtml(ticket.customerEmail)}</div>
+            <div>
+                <h2>${escapeHtml(ticketTitle(ticket))}</h2>
+                <div class="ticket-meta">
+                    <span>${escapeHtml(ticket.customerEmail)}</span>
+                    <span>${new Date(ticket.createdAt).toLocaleDateString(currentLanguage === "pt" ? "pt-BR" : "en-US")}</span>
                 </div>
-                <div class="muted">${new Date(ticket.createdAt).toLocaleDateString(currentLanguage === "pt" ? "pt-BR" : "en-US")}</div>
+                <div class="badges" aria-label="Ticket labels">
+                    <span class="badge status-${ticket.status}">${translateValue("statuses", ticket.status)}</span>
+                    <span class="badge priority-${ticket.priority}">${translateValue("priorities", ticket.priority)}</span>
+                </div>
+                <p>${escapeHtml(ticketDescription(ticket))}</p>
             </div>
-            <div class="tags">
-                <span class="tag">${translateValue("statuses", ticket.status)}</span>
-                <span class="tag">${translateValue("priorities", ticket.priority)}</span>
-            </div>
-            <p>${escapeHtml(ticketDescription(ticket))}</p>
-            <div class="actions">
-                <button class="button" type="button" data-edit="${ticket.id}">${content[currentLanguage].buttons.edit}</button>
-                <button class="button danger" type="button" data-delete="${ticket.id}">${content[currentLanguage].buttons.delete}</button>
+            <div class="ticket-actions">
+                <button class="button" type="button" data-edit="${ticket.id}">${t().buttons.edit}</button>
+                <button class="button danger" type="button" data-delete="${ticket.id}">${t().buttons.delete}</button>
             </div>
         </article>
     `).join("");
 }
 
+function renderAll() {
+    renderFilters();
+    renderStats();
+    renderTickets();
+}
+
+function openModal() {
+    document.getElementById("ticket-modal").classList.add("open");
+    document.getElementById("title").focus();
+}
+
+function closeModal() {
+    document.getElementById("ticket-modal").classList.remove("open");
+}
+
 function resetForm() {
-    document.getElementById("form-title").textContent = content[currentLanguage].formNew;
-    document.getElementById("save-button").textContent = content[currentLanguage].buttons.create;
+    document.getElementById("form-title").textContent = t().formNew;
+    document.getElementById("save-button").textContent = t().buttons.create;
     document.getElementById("ticket-form").reset();
     document.getElementById("ticket-id").value = "";
     document.getElementById("priority").value = "normal";
     document.getElementById("status").value = "open";
 }
 
+function newTicket() {
+    resetForm();
+    openModal();
+}
+
 function editTicket(id) {
     const ticket = getTickets().find((item) => item.id === id);
     if (!ticket) return;
-    document.getElementById("form-title").textContent = content[currentLanguage].formEdit;
-    document.getElementById("save-button").textContent = content[currentLanguage].buttons.save;
+    document.getElementById("form-title").textContent = t().formEdit;
+    document.getElementById("save-button").textContent = t().buttons.save;
     document.getElementById("ticket-id").value = ticket.id;
     document.getElementById("title").value = ticketTitle(ticket);
     document.getElementById("customer-email").value = ticket.customerEmail;
     document.getElementById("priority").value = ticket.priority;
     document.getElementById("status").value = ticket.status;
     document.getElementById("description").value = ticketDescription(ticket);
-    document.getElementById("title").focus();
+    openModal();
 }
 
 function deleteTicket(id) {
     saveTickets(getTickets().filter((ticket) => ticket.id !== id));
     resetForm();
-    renderTickets();
-    showNotice(content[currentLanguage].notices.deleted);
+    renderAll();
+    showNotice(t().notices.deleted);
 }
 
 function handleSubmit(event) {
@@ -640,73 +1110,107 @@ function handleSubmit(event) {
     if (id) {
         const updated = tickets.map((ticket) => ticket.id === id ? { ...ticket, ...values, seedKey: undefined } : ticket);
         saveTickets(updated);
-        showNotice(content[currentLanguage].notices.updated);
+        showNotice(t().notices.updated);
     } else {
         saveTickets([{ id: crypto.randomUUID(), ...values, createdAt: new Date().toISOString() }, ...tickets]);
-        showNotice(content[currentLanguage].notices.created);
+        showNotice(t().notices.created);
     }
 
     resetForm();
-    renderTickets();
+    closeModal();
+    renderAll();
 }
 
 function setLanguage(language) {
     currentLanguage = language;
     localStorage.setItem(LANGUAGE_KEY, language);
-    const selected = content[language];
+    const selected = t();
     const selectedPriority = document.getElementById("priority").value || "normal";
     const selectedStatus = document.getElementById("status").value || "open";
     const isEditing = document.getElementById("ticket-id").value !== "";
+
     document.documentElement.lang = language === "pt" ? "pt-BR" : "en";
     document.title = selected.documentTitle;
+    document.getElementById("app-name").textContent = selected.appName;
+    document.getElementById("app-caption").textContent = selected.appCaption;
     document.getElementById("back-link").textContent = selected.back;
+    document.getElementById("queue-label").textContent = selected.queueLabel;
+    document.getElementById("eyebrow").textContent = selected.eyebrow;
     document.getElementById("page-title").textContent = selected.title;
     document.getElementById("subtitle").textContent = selected.subtitle;
     document.getElementById("source-link").textContent = selected.source;
     document.getElementById("reset-button").textContent = selected.reset;
+    document.getElementById("new-ticket-button").textContent = selected.newTicket;
+    document.getElementById("search-label").textContent = selected.labels.search;
+    document.getElementById("search").placeholder = selected.placeholders.search;
+    document.getElementById("priority-filter-label").textContent = selected.labels.priorityFilter;
+    document.getElementById("sort-label").textContent = selected.labels.sort;
     document.getElementById("title-label").textContent = selected.labels.title;
     document.getElementById("email-label").textContent = selected.labels.email;
     document.getElementById("priority-label").textContent = selected.labels.priority;
     document.getElementById("status-label").textContent = selected.labels.status;
     document.getElementById("description-label").textContent = selected.labels.description;
     document.getElementById("cancel-button").textContent = selected.buttons.cancel;
+    document.getElementById("close-modal").setAttribute("aria-label", selected.close);
     document.getElementById("lang-en").classList.toggle("active", language === "en");
     document.getElementById("lang-pt").classList.toggle("active", language === "pt");
+
     renderSelectOptions();
     document.getElementById("priority").value = selectedPriority;
     document.getElementById("status").value = selectedStatus;
     document.getElementById("form-title").textContent = isEditing ? selected.formEdit : selected.formNew;
     document.getElementById("save-button").textContent = isEditing ? selected.buttons.save : selected.buttons.create;
-    renderFilters();
-    renderTickets();
+    renderAll();
 }
 
 document.getElementById("ticket-form").addEventListener("submit", handleSubmit);
-document.getElementById("cancel-button").addEventListener("click", resetForm);
+document.getElementById("new-ticket-button").addEventListener("click", newTicket);
+document.getElementById("cancel-button").addEventListener("click", closeModal);
+document.getElementById("close-modal").addEventListener("click", closeModal);
 document.getElementById("lang-en").addEventListener("click", () => setLanguage("en"));
 document.getElementById("lang-pt").addEventListener("click", () => setLanguage("pt"));
+document.getElementById("search").addEventListener("input", (event) => {
+    currentSearch = event.target.value;
+    renderTickets();
+});
+document.getElementById("priority-filter").addEventListener("change", (event) => {
+    currentPriority = event.target.value;
+    renderTickets();
+});
+document.getElementById("sort").addEventListener("change", (event) => {
+    currentSort = event.target.value;
+    renderTickets();
+});
 document.getElementById("reset-button").addEventListener("click", () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(seedTickets));
     currentFilter = "all";
+    currentPriority = "all";
+    currentSort = "newest";
+    currentSearch = "";
+    document.getElementById("search").value = "";
+    renderSelectOptions();
     resetForm();
-    renderFilters();
-    renderTickets();
-    showNotice(content[currentLanguage].notices.restored);
+    closeModal();
+    renderAll();
+    showNotice(t().notices.restored);
 });
-
 document.getElementById("filters").addEventListener("click", (event) => {
     const button = event.target.closest("[data-filter]");
     if (!button) return;
     currentFilter = button.dataset.filter;
-    renderFilters();
-    renderTickets();
+    renderAll();
 });
-
 document.getElementById("tickets").addEventListener("click", (event) => {
     const editButton = event.target.closest("[data-edit]");
     const deleteButton = event.target.closest("[data-delete]");
     if (editButton) editTicket(editButton.dataset.edit);
     if (deleteButton) deleteTicket(deleteButton.dataset.delete);
+});
+document.getElementById("ticket-modal").addEventListener("click", (event) => {
+    if (event.target.id === "ticket-modal") closeModal();
+});
+document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeModal();
 });
 
 renderSelectOptions();
