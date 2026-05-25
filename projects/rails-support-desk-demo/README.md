@@ -15,6 +15,10 @@ This demo shows that a backend developer can move from .NET MVC patterns into Ra
 - Basic model and controller tests
 - Seed data for a quick demo
 
+## Live portfolio demo
+
+`index.html` is a static GitHub Pages version of the same workflow. It runs entirely in the browser with `localStorage`, so visitors can try the ticket CRUD flow directly from the portfolio while this folder also keeps the Rails source code.
+
 ## Run locally
 
 ```powershell

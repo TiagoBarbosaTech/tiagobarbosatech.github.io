@@ -317,6 +317,7 @@ section {
                 <p id="project-description"></p>
                 <div class="stack" id="project-stack"></div>
                 <div class="project-links">
+                    <a href="projects/rails-support-desk-demo/" id="demo-link"></a>
                     <a href="https://github.com/tiagobarbosatech/tiagobarbosatech.github.io/tree/main/projects/rails-support-desk-demo" target="_blank" rel="noreferrer" id="repo-link"></a>
                 </div>
             </div>
@@ -342,6 +343,7 @@ const content = {
     projectTitle: "Rails Support Desk Demo",
     projectDescription: "A Ruby on Rails CRUD demo for managing support tickets. It shows MVC structure, validations, flash messages, simple filtering, seed data and a clean user flow that maps well to real SaaS support operations.",
     projectStack: ["Ruby on Rails", "SQLite", "Active Record", "ERB", "Minitest"],
+    demoLink: "Open live demo",
     repoLink: "View repository",
     projectMetric: "Ticket creation, status changes and priority tracking in a small Rails application."
   },
@@ -357,6 +359,7 @@ const content = {
     projectTitle: "Rails Support Desk Demo",
     projectDescription: "Um demo CRUD em Ruby on Rails para gerenciar tickets de suporte. Ele mostra estrutura MVC, validacoes, mensagens flash, filtros simples, dados iniciais e um fluxo de uso parecido com operacoes reais de SaaS.",
     projectStack: ["Ruby on Rails", "SQLite", "Active Record", "ERB", "Minitest"],
+    demoLink: "Abrir demo",
     repoLink: "Ver repositorio",
     projectMetric: "Criacao de tickets, mudanca de status e controle de prioridade em uma pequena aplicacao Rails."
   }
@@ -384,6 +387,7 @@ function setLanguage(lang) {
     document.getElementById("projects-title").innerText = selected.projectsTitle;
     document.getElementById("project-title").innerText = selected.projectTitle;
     document.getElementById("project-description").innerText = selected.projectDescription;
+    document.getElementById("demo-link").innerText = selected.demoLink;
     document.getElementById("repo-link").innerText = selected.repoLink;
     document.getElementById("project-metric").innerText = selected.projectMetric;
     renderTags("stack", selected.stack);

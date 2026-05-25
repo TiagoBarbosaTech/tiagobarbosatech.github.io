@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rails Support Desk Demo</title>
+<meta name="description" content="A static browser demo of a Rails support ticket CRUD workflow.">
+<style>
+:root {
+    --bg: #f8fafc;
+    --surface: #ffffff;
+    --surface-strong: #e2e8f0;
+    --text: #0f172a;
+    --muted: #64748b;
+    --accent: #0369a1;
+    --accent-strong: #075985;
+    --line: #cbd5e1;
+    --danger: #b91c1c;
+    --success: #166534;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+.page {
+    width: min(1120px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 28px 0 46px;
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 26px;
+}
+
+.back {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 700;
+}
+
+h1 {
+    font-size: clamp(34px, 6vw, 56px);
+    margin: 10px 0 8px;
+}
+
+.subtitle {
+    color: var(--muted);
+    font-size: 18px;
+    line-height: 1.5;
+    max-width: 760px;
+    margin: 0;
+}
+
+.toolbar,
+.panel,
+.ticket {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+}
+
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    padding: 14px;
+    margin: 28px 0 16px;
+}
+
+.filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.filter,
+.button {
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px 13px;
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.filter.active,
+.button.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+}
+
+.button.danger {
+    color: var(--danger);
+}
+
+.layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 18px;
+    align-items: start;
+}
+
+.tickets {
+    display: grid;
+    gap: 12px;
+}
+
+.ticket {
+    padding: 18px;
+}
+
+.ticket-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.ticket h2 {
+    font-size: 20px;
+    margin: 0 0 6px;
+}
+
+.muted {
+    color: var(--muted);
+}
+
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0;
+}
+
+.tag {
+    background: #e0f2fe;
+    color: var(--accent-strong);
+    border-radius: 999px;
+    padding: 5px 9px;
+    font-size: 13px;
+}
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.panel {
+    padding: 18px;
+    position: sticky;
+    top: 16px;
+}
+
+.panel h2 {
+    margin: 0 0 12px;
+    font-size: 22px;
+}
+
+label {
+    display: block;
+    font-weight: 700;
+    margin: 13px 0 6px;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px;
+    background: white;
+    color: var(--text);
+}
+
+textarea {
+    min-height: 132px;
+    resize: vertical;
+}
+
+.notice {
+    display: none;
+    margin: 0 0 16px;
+    padding: 12px 14px;
+    border-radius: 6px;
+    background: #dcfce7;
+    color: var(--success);
+}
+
+.notice.show {
+    display: block;
+}
+
+.empty {
+    padding: 28px;
+    text-align: center;
+}
+
+@media (max-width: 850px) {
+    .topbar,
+    .toolbar,
+    .ticket-header {
+        flex-direction: column;
+    }
+
+    .layout {
+        grid-template-columns: 1fr;
+    }
+
+    .panel {
+        position: static;
+    }
+}
+</style>
+</head>
+<body>
+<main class="page">
+    <header class="topbar">
+        <div>
+            <a class="back" href="../../">Back to portfolio</a>
+            <h1>Rails Support Desk Demo</h1>
+            <p class="subtitle">A working browser version of the Rails CRUD project. Add tickets, edit status or priority, filter the queue and delete records. Data is saved locally in this browser.</p>
+        </div>
+        <a class="button" href="https://github.com/tiagobarbosatech/tiagobarbosatech.github.io/tree/main/projects/rails-support-desk-demo" target="_blank" rel="noreferrer">Source code</a>
+    </header>
+
+    <div class="notice" id="notice"></div>
+
+    <section class="toolbar" aria-label="Ticket filters">
+        <div class="filters" id="filters"></div>
+        <button class="button" type="button" id="reset-button">Reset demo data</button>
+    </section>
+
+    <section class="layout">
+        <div class="tickets" id="tickets"></div>
+
+        <aside class="panel" aria-labelledby="form-title">
+            <h2 id="form-title">New ticket</h2>
+            <form id="ticket-form">
+                <input type="hidden" id="ticket-id">
+
+                <label for="title">Title</label>
+                <input id="title" required maxlength="90">
+
+                <label for="customer-email">Customer email</label>
+                <input id="customer-email" type="email" required>
+
+                <label for="priority">Priority</label>
+                <select id="priority" required></select>
+
+                <label for="status">Status</label>
+                <select id="status" required></select>
+
+                <label for="description">Description</label>
+                <textarea id="description" required></textarea>
+
+                <div class="actions">
+                    <button class="button primary" type="submit" id="save-button">Create ticket</button>
+                    <button class="button" type="button" id="cancel-button">Cancel</button>
+                </div>
+            </form>
+        </aside>
+    </section>
+</main>
+
+<script>
+const STORAGE_KEY = "rails-support-desk-demo:tickets";
+const statuses = ["open", "in_progress", "resolved", "closed"];
+const priorities = ["low", "normal", "high", "urgent"];
+let currentFilter = "all";
+
+const seedTickets = [
+    {
+        id: crypto.randomUUID(),
+        title: "Customer cannot export leads",
+        customerEmail: "ana@example.com",
+        priority: "high",
+        status: "in_progress",
+        description: "The export button returns an error for a filtered lead list. The customer needs the CSV before the end of the day.",
+        createdAt: new Date("2026-05-20T14:30:00").toISOString()
+    },
+    {
+        id: crypto.randomUUID(),
+        title: "Invoice email was not delivered",
+        customerEmail: "billing@example.com",
+        priority: "normal",
+        status: "open",
+        description: "Customer reports that the invoice email did not arrive. Check delivery logs and resend if needed.",
+        createdAt: new Date("2026-05-21T09:15:00").toISOString()
+    },
+    {
+        id: crypto.randomUUID(),
+        title: "API token rotation completed",
+        customerEmail: "ops@example.com",
+        priority: "low",
+        status: "resolved",
+        description: "Token rotation was completed and validated in the staging integration.",
+        createdAt: new Date("2026-05-22T11:45:00").toISOString()
+    }
+];
+
+function humanize(value) {
+    return value.replace(/_/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function getTickets() {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (!stored) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(seedTickets));
+        return [...seedTickets];
+    }
+    return JSON.parse(stored);
+}
+
+function saveTickets(tickets) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tickets));
+}
+
+function showNotice(message) {
+    const notice = document.getElementById("notice");
+    notice.textContent = message;
+    notice.classList.add("show");
+    window.setTimeout(() => notice.classList.remove("show"), 2200);
+}
+
+function renderSelectOptions() {
+    const statusSelect = document.getElementById("status");
+    const prioritySelect = document.getElementById("priority");
+    statusSelect.innerHTML = statuses.map((status) => `<option value="${status}">${humanize(status)}</option>`).join("");
+    prioritySelect.innerHTML = priorities.map((priority) => `<option value="${priority}">${humanize(priority)}</option>`).join("");
+}
+
+function renderFilters() {
+    const filters = document.getElementById("filters");
+    const values = ["all", ...statuses];
+    filters.innerHTML = values.map((value) => {
+        const label = value === "all" ? "All" : humanize(value);
+        const active = value === currentFilter ? " active" : "";
+        return `<button class="filter${active}" type="button" data-filter="${value}">${label}</button>`;
+    }).join("");
+}
+
+function renderTickets() {
+    const container = document.getElementById("tickets");
+    const tickets = getTickets()
+        .filter((ticket) => currentFilter === "all" || ticket.status === currentFilter)
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    if (tickets.length === 0) {
+        container.innerHTML = '<div class="ticket empty">No tickets found for this filter.</div>';
+        return;
+    }
+
+    container.innerHTML = tickets.map((ticket) => `
+        <article class="ticket">
+            <div class="ticket-header">
+                <div>
+                    <h2>${ticket.title}</h2>
+                    <div class="muted">${ticket.customerEmail}</div>
+                </div>
+                <div class="muted">${new Date(ticket.createdAt).toLocaleDateString()}</div>
+            </div>
+            <div class="tags">
+                <span class="tag">${humanize(ticket.status)}</span>
+                <span class="tag">${humanize(ticket.priority)}</span>
+            </div>
+            <p>${ticket.description}</p>
+            <div class="actions">
+                <button class="button" type="button" data-edit="${ticket.id}">Edit</button>
+                <button class="button danger" type="button" data-delete="${ticket.id}">Delete</button>
+            </div>
+        </article>
+    `).join("");
+}
+
+function resetForm() {
+    document.getElementById("form-title").textContent = "New ticket";
+    document.getElementById("save-button").textContent = "Create ticket";
+    document.getElementById("ticket-form").reset();
+    document.getElementById("ticket-id").value = "";
+    document.getElementById("priority").value = "normal";
+    document.getElementById("status").value = "open";
+}
+
+function editTicket(id) {
+    const ticket = getTickets().find((item) => item.id === id);
+    if (!ticket) return;
+    document.getElementById("form-title").textContent = "Edit ticket";
+    document.getElementById("save-button").textContent = "Save changes";
+    document.getElementById("ticket-id").value = ticket.id;
+    document.getElementById("title").value = ticket.title;
+    document.getElementById("customer-email").value = ticket.customerEmail;
+    document.getElementById("priority").value = ticket.priority;
+    document.getElementById("status").value = ticket.status;
+    document.getElementById("description").value = ticket.description;
+    document.getElementById("title").focus();
+}
+
+function deleteTicket(id) {
+    saveTickets(getTickets().filter((ticket) => ticket.id !== id));
+    resetForm();
+    renderTickets();
+    showNotice("Ticket deleted.");
+}
+
+function handleSubmit(event) {
+    event.preventDefault();
+    const id = document.getElementById("ticket-id").value;
+    const tickets = getTickets();
+    const values = {
+        title: document.getElementById("title").value.trim(),
+        customerEmail: document.getElementById("customer-email").value.trim(),
+        priority: document.getElementById("priority").value,
+        status: document.getElementById("status").value,
+        description: document.getElementById("description").value.trim()
+    };
+
+    if (id) {
+        const updated = tickets.map((ticket) => ticket.id === id ? { ...ticket, ...values } : ticket);
+        saveTickets(updated);
+        showNotice("Ticket updated.");
+    } else {
+        saveTickets([{ id: crypto.randomUUID(), ...values, createdAt: new Date().toISOString() }, ...tickets]);
+        showNotice("Ticket created.");
+    }
+
+    resetForm();
+    renderTickets();
+}
+
+document.getElementById("ticket-form").addEventListener("submit", handleSubmit);
+document.getElementById("cancel-button").addEventListener("click", resetForm);
+document.getElementById("reset-button").addEventListener("click", () => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(seedTickets));
+    currentFilter = "all";
+    resetForm();
+    renderFilters();
+    renderTickets();
+    showNotice("Demo data restored.");
+});
+
+document.getElementById("filters").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-filter]");
+    if (!button) return;
+    currentFilter = button.dataset.filter;
+    renderFilters();
+    renderTickets();
+});
+
+document.getElementById("tickets").addEventListener("click", (event) => {
+    const editButton = event.target.closest("[data-edit]");
+    const deleteButton = event.target.closest("[data-delete]");
+    if (editButton) editTicket(editButton.dataset.edit);
+    if (deleteButton) deleteTicket(deleteButton.dataset.delete);
+});
+
+renderSelectOptions();
+resetForm();
+renderFilters();
+renderTickets();
+</script>
+</body>
+</html>
