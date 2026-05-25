@@ -51,6 +51,41 @@ textarea {
     margin-bottom: 26px;
 }
 
+.top-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.language {
+    display: flex;
+    gap: 8px;
+}
+
+.language button {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 9px 11px;
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+}
+
+.language button.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+}
+
+.language img {
+    width: 20px;
+    height: auto;
+}
+
 .back {
     color: var(--accent);
     text-decoration: none;
@@ -240,11 +275,23 @@ textarea {
 <main class="page">
     <header class="topbar">
         <div>
-            <a class="back" href="../../">Back to portfolio</a>
-            <h1>Rails Support Desk Demo</h1>
-            <p class="subtitle">A working browser version of the Rails CRUD project. Add tickets, edit status or priority, filter the queue and delete records. Data is saved locally in this browser.</p>
+            <a class="back" href="../../" id="back-link">Back to portfolio</a>
+            <h1 id="page-title">Rails Support Desk Demo</h1>
+            <p class="subtitle" id="subtitle">A working browser version of the Rails CRUD project. Add tickets, edit status or priority, filter the queue and delete records. Data is saved locally in this browser.</p>
         </div>
-        <a class="button" href="https://github.com/tiagobarbosatech/tiagobarbosatech.github.io/tree/main/projects/rails-support-desk-demo" target="_blank" rel="noreferrer">Source code</a>
+        <div class="top-actions">
+            <div class="language" aria-label="Language">
+                <button type="button" id="lang-en">
+                    <img src="https://flagcdn.com/w20/us.png" alt="">
+                    EN
+                </button>
+                <button type="button" id="lang-pt">
+                    <img src="https://flagcdn.com/w20/br.png" alt="">
+                    PT
+                </button>
+            </div>
+            <a class="button" href="https://github.com/tiagobarbosatech/tiagobarbosatech.github.io/tree/main/projects/rails-support-desk-demo" target="_blank" rel="noreferrer" id="source-link">Source code</a>
+        </div>
     </header>
 
     <div class="notice" id="notice"></div>
@@ -262,19 +309,19 @@ textarea {
             <form id="ticket-form">
                 <input type="hidden" id="ticket-id">
 
-                <label for="title">Title</label>
+                <label for="title" id="title-label">Title</label>
                 <input id="title" required maxlength="90">
 
-                <label for="customer-email">Customer email</label>
+                <label for="customer-email" id="email-label">Customer email</label>
                 <input id="customer-email" type="email" required>
 
-                <label for="priority">Priority</label>
+                <label for="priority" id="priority-label">Priority</label>
                 <select id="priority" required></select>
 
-                <label for="status">Status</label>
+                <label for="status" id="status-label">Status</label>
                 <select id="status" required></select>
 
-                <label for="description">Description</label>
+                <label for="description" id="description-label">Description</label>
                 <textarea id="description" required></textarea>
 
                 <div class="actions">
@@ -288,13 +335,16 @@ textarea {
 
 <script>
 const STORAGE_KEY = "rails-support-desk-demo:tickets";
+const LANGUAGE_KEY = "rails-support-desk-demo:language";
 const statuses = ["open", "in_progress", "resolved", "closed"];
 const priorities = ["low", "normal", "high", "urgent"];
 let currentFilter = "all";
+let currentLanguage = localStorage.getItem(LANGUAGE_KEY) || "en";
 
 const seedTickets = [
     {
         id: crypto.randomUUID(),
+        seedKey: "exportLeads",
         title: "Customer cannot export leads",
         customerEmail: "ana@example.com",
         priority: "high",
@@ -304,6 +354,7 @@ const seedTickets = [
     },
     {
         id: crypto.randomUUID(),
+        seedKey: "invoiceEmail",
         title: "Invoice email was not delivered",
         customerEmail: "billing@example.com",
         priority: "normal",
@@ -313,6 +364,7 @@ const seedTickets = [
     },
     {
         id: crypto.randomUUID(),
+        seedKey: "tokenRotation",
         title: "API token rotation completed",
         customerEmail: "ops@example.com",
         priority: "low",
@@ -322,8 +374,148 @@ const seedTickets = [
     }
 ];
 
-function humanize(value) {
-    return value.replace(/_/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+const content = {
+    en: {
+        documentTitle: "Rails Support Desk Demo",
+        back: "Back to portfolio",
+        title: "Rails Support Desk Demo",
+        subtitle: "A working browser version of the Rails CRUD project. Add tickets, edit status or priority, filter the queue and delete records. Data is saved locally in this browser.",
+        source: "Source code",
+        reset: "Reset demo data",
+        formNew: "New ticket",
+        formEdit: "Edit ticket",
+        labels: {
+            title: "Title",
+            email: "Customer email",
+            priority: "Priority",
+            status: "Status",
+            description: "Description"
+        },
+        buttons: {
+            create: "Create ticket",
+            save: "Save changes",
+            cancel: "Cancel",
+            edit: "Edit",
+            delete: "Delete"
+        },
+        filters: {
+            all: "All"
+        },
+        statuses: {
+            open: "Open",
+            in_progress: "In Progress",
+            resolved: "Resolved",
+            closed: "Closed"
+        },
+        priorities: {
+            low: "Low",
+            normal: "Normal",
+            high: "High",
+            urgent: "Urgent"
+        },
+        notices: {
+            created: "Ticket created.",
+            updated: "Ticket updated.",
+            deleted: "Ticket deleted.",
+            restored: "Demo data restored."
+        },
+        empty: "No tickets found for this filter.",
+        seeds: {
+            exportLeads: {
+                title: "Customer cannot export leads",
+                description: "The export button returns an error for a filtered lead list. The customer needs the CSV before the end of the day."
+            },
+            invoiceEmail: {
+                title: "Invoice email was not delivered",
+                description: "Customer reports that the invoice email did not arrive. Check delivery logs and resend if needed."
+            },
+            tokenRotation: {
+                title: "API token rotation completed",
+                description: "Token rotation was completed and validated in the staging integration."
+            }
+        }
+    },
+    pt: {
+        documentTitle: "Demo Rails de Suporte",
+        back: "Voltar ao portfólio",
+        title: "Demo Rails de Suporte",
+        subtitle: "Uma versão funcional no navegador do projeto CRUD em Rails. Crie tickets, edite status ou prioridade, filtre a fila e exclua registros. Os dados ficam salvos localmente neste navegador.",
+        source: "Código fonte",
+        reset: "Restaurar dados da demo",
+        formNew: "Novo ticket",
+        formEdit: "Editar ticket",
+        labels: {
+            title: "Título",
+            email: "E-mail do cliente",
+            priority: "Prioridade",
+            status: "Status",
+            description: "Descrição"
+        },
+        buttons: {
+            create: "Criar ticket",
+            save: "Salvar alterações",
+            cancel: "Cancelar",
+            edit: "Editar",
+            delete: "Excluir"
+        },
+        filters: {
+            all: "Todos"
+        },
+        statuses: {
+            open: "Aberto",
+            in_progress: "Em andamento",
+            resolved: "Resolvido",
+            closed: "Fechado"
+        },
+        priorities: {
+            low: "Baixa",
+            normal: "Normal",
+            high: "Alta",
+            urgent: "Urgente"
+        },
+        notices: {
+            created: "Ticket criado.",
+            updated: "Ticket atualizado.",
+            deleted: "Ticket excluído.",
+            restored: "Dados da demo restaurados."
+        },
+        empty: "Nenhum ticket encontrado para este filtro.",
+        seeds: {
+            exportLeads: {
+                title: "Cliente não consegue exportar leads",
+                description: "O botão de exportação retorna erro para uma lista filtrada de leads. O cliente precisa do CSV até o fim do dia."
+            },
+            invoiceEmail: {
+                title: "E-mail de fatura não foi entregue",
+                description: "O cliente informou que o e-mail da fatura não chegou. Verifique os logs de entrega e reenvie se necessário."
+            },
+            tokenRotation: {
+                title: "Rotação de token da API concluída",
+                description: "A rotação do token foi concluída e validada na integração de homologação."
+            }
+        }
+    }
+};
+
+function translateValue(group, value) {
+    return content[currentLanguage][group][value] || value;
+}
+
+function escapeHtml(value) {
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function ticketTitle(ticket) {
+    return ticket.seedKey ? content[currentLanguage].seeds[ticket.seedKey].title : ticket.title;
+}
+
+function ticketDescription(ticket) {
+    return ticket.seedKey ? content[currentLanguage].seeds[ticket.seedKey].description : ticket.description;
 }
 
 function getTickets() {
@@ -332,7 +524,14 @@ function getTickets() {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(seedTickets));
         return [...seedTickets];
     }
-    return JSON.parse(stored);
+    const tickets = JSON.parse(stored);
+    return tickets.map((ticket) => {
+        if (ticket.seedKey) return ticket;
+        if (ticket.title === "Customer cannot export leads") return { ...ticket, seedKey: "exportLeads" };
+        if (ticket.title === "Invoice email was not delivered") return { ...ticket, seedKey: "invoiceEmail" };
+        if (ticket.title === "API token rotation completed") return { ...ticket, seedKey: "tokenRotation" };
+        return ticket;
+    });
 }
 
 function saveTickets(tickets) {
@@ -349,15 +548,15 @@ function showNotice(message) {
 function renderSelectOptions() {
     const statusSelect = document.getElementById("status");
     const prioritySelect = document.getElementById("priority");
-    statusSelect.innerHTML = statuses.map((status) => `<option value="${status}">${humanize(status)}</option>`).join("");
-    prioritySelect.innerHTML = priorities.map((priority) => `<option value="${priority}">${humanize(priority)}</option>`).join("");
+    statusSelect.innerHTML = statuses.map((status) => `<option value="${status}">${translateValue("statuses", status)}</option>`).join("");
+    prioritySelect.innerHTML = priorities.map((priority) => `<option value="${priority}">${translateValue("priorities", priority)}</option>`).join("");
 }
 
 function renderFilters() {
     const filters = document.getElementById("filters");
     const values = ["all", ...statuses];
     filters.innerHTML = values.map((value) => {
-        const label = value === "all" ? "All" : humanize(value);
+        const label = value === "all" ? content[currentLanguage].filters.all : translateValue("statuses", value);
         const active = value === currentFilter ? " active" : "";
         return `<button class="filter${active}" type="button" data-filter="${value}">${label}</button>`;
     }).join("");
@@ -370,7 +569,7 @@ function renderTickets() {
         .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
     if (tickets.length === 0) {
-        container.innerHTML = '<div class="ticket empty">No tickets found for this filter.</div>';
+        container.innerHTML = `<div class="ticket empty">${content[currentLanguage].empty}</div>`;
         return;
     }
 
@@ -378,27 +577,27 @@ function renderTickets() {
         <article class="ticket">
             <div class="ticket-header">
                 <div>
-                    <h2>${ticket.title}</h2>
-                    <div class="muted">${ticket.customerEmail}</div>
+                    <h2>${escapeHtml(ticketTitle(ticket))}</h2>
+                    <div class="muted">${escapeHtml(ticket.customerEmail)}</div>
                 </div>
-                <div class="muted">${new Date(ticket.createdAt).toLocaleDateString()}</div>
+                <div class="muted">${new Date(ticket.createdAt).toLocaleDateString(currentLanguage === "pt" ? "pt-BR" : "en-US")}</div>
             </div>
             <div class="tags">
-                <span class="tag">${humanize(ticket.status)}</span>
-                <span class="tag">${humanize(ticket.priority)}</span>
+                <span class="tag">${translateValue("statuses", ticket.status)}</span>
+                <span class="tag">${translateValue("priorities", ticket.priority)}</span>
             </div>
-            <p>${ticket.description}</p>
+            <p>${escapeHtml(ticketDescription(ticket))}</p>
             <div class="actions">
-                <button class="button" type="button" data-edit="${ticket.id}">Edit</button>
-                <button class="button danger" type="button" data-delete="${ticket.id}">Delete</button>
+                <button class="button" type="button" data-edit="${ticket.id}">${content[currentLanguage].buttons.edit}</button>
+                <button class="button danger" type="button" data-delete="${ticket.id}">${content[currentLanguage].buttons.delete}</button>
             </div>
         </article>
     `).join("");
 }
 
 function resetForm() {
-    document.getElementById("form-title").textContent = "New ticket";
-    document.getElementById("save-button").textContent = "Create ticket";
+    document.getElementById("form-title").textContent = content[currentLanguage].formNew;
+    document.getElementById("save-button").textContent = content[currentLanguage].buttons.create;
     document.getElementById("ticket-form").reset();
     document.getElementById("ticket-id").value = "";
     document.getElementById("priority").value = "normal";
@@ -408,14 +607,14 @@ function resetForm() {
 function editTicket(id) {
     const ticket = getTickets().find((item) => item.id === id);
     if (!ticket) return;
-    document.getElementById("form-title").textContent = "Edit ticket";
-    document.getElementById("save-button").textContent = "Save changes";
+    document.getElementById("form-title").textContent = content[currentLanguage].formEdit;
+    document.getElementById("save-button").textContent = content[currentLanguage].buttons.save;
     document.getElementById("ticket-id").value = ticket.id;
-    document.getElementById("title").value = ticket.title;
+    document.getElementById("title").value = ticketTitle(ticket);
     document.getElementById("customer-email").value = ticket.customerEmail;
     document.getElementById("priority").value = ticket.priority;
     document.getElementById("status").value = ticket.status;
-    document.getElementById("description").value = ticket.description;
+    document.getElementById("description").value = ticketDescription(ticket);
     document.getElementById("title").focus();
 }
 
@@ -423,7 +622,7 @@ function deleteTicket(id) {
     saveTickets(getTickets().filter((ticket) => ticket.id !== id));
     resetForm();
     renderTickets();
-    showNotice("Ticket deleted.");
+    showNotice(content[currentLanguage].notices.deleted);
 }
 
 function handleSubmit(event) {
@@ -439,27 +638,60 @@ function handleSubmit(event) {
     };
 
     if (id) {
-        const updated = tickets.map((ticket) => ticket.id === id ? { ...ticket, ...values } : ticket);
+        const updated = tickets.map((ticket) => ticket.id === id ? { ...ticket, ...values, seedKey: undefined } : ticket);
         saveTickets(updated);
-        showNotice("Ticket updated.");
+        showNotice(content[currentLanguage].notices.updated);
     } else {
         saveTickets([{ id: crypto.randomUUID(), ...values, createdAt: new Date().toISOString() }, ...tickets]);
-        showNotice("Ticket created.");
+        showNotice(content[currentLanguage].notices.created);
     }
 
     resetForm();
     renderTickets();
 }
 
+function setLanguage(language) {
+    currentLanguage = language;
+    localStorage.setItem(LANGUAGE_KEY, language);
+    const selected = content[language];
+    const selectedPriority = document.getElementById("priority").value || "normal";
+    const selectedStatus = document.getElementById("status").value || "open";
+    const isEditing = document.getElementById("ticket-id").value !== "";
+    document.documentElement.lang = language === "pt" ? "pt-BR" : "en";
+    document.title = selected.documentTitle;
+    document.getElementById("back-link").textContent = selected.back;
+    document.getElementById("page-title").textContent = selected.title;
+    document.getElementById("subtitle").textContent = selected.subtitle;
+    document.getElementById("source-link").textContent = selected.source;
+    document.getElementById("reset-button").textContent = selected.reset;
+    document.getElementById("title-label").textContent = selected.labels.title;
+    document.getElementById("email-label").textContent = selected.labels.email;
+    document.getElementById("priority-label").textContent = selected.labels.priority;
+    document.getElementById("status-label").textContent = selected.labels.status;
+    document.getElementById("description-label").textContent = selected.labels.description;
+    document.getElementById("cancel-button").textContent = selected.buttons.cancel;
+    document.getElementById("lang-en").classList.toggle("active", language === "en");
+    document.getElementById("lang-pt").classList.toggle("active", language === "pt");
+    renderSelectOptions();
+    document.getElementById("priority").value = selectedPriority;
+    document.getElementById("status").value = selectedStatus;
+    document.getElementById("form-title").textContent = isEditing ? selected.formEdit : selected.formNew;
+    document.getElementById("save-button").textContent = isEditing ? selected.buttons.save : selected.buttons.create;
+    renderFilters();
+    renderTickets();
+}
+
 document.getElementById("ticket-form").addEventListener("submit", handleSubmit);
 document.getElementById("cancel-button").addEventListener("click", resetForm);
+document.getElementById("lang-en").addEventListener("click", () => setLanguage("en"));
+document.getElementById("lang-pt").addEventListener("click", () => setLanguage("pt"));
 document.getElementById("reset-button").addEventListener("click", () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(seedTickets));
     currentFilter = "all";
     resetForm();
     renderFilters();
     renderTickets();
-    showNotice("Demo data restored.");
+    showNotice(content[currentLanguage].notices.restored);
 });
 
 document.getElementById("filters").addEventListener("click", (event) => {
@@ -479,8 +711,7 @@ document.getElementById("tickets").addEventListener("click", (event) => {
 
 renderSelectOptions();
 resetForm();
-renderFilters();
-renderTickets();
+setLanguage(currentLanguage);
 </script>
 </body>
 </html>
