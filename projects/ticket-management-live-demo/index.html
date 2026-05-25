@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rails Support Desk Demo</title>
+<title>Ticket Management Live Demo</title>
 <meta name="description" content="A static browser demo of a Rails support ticket CRUD workflow.">
 <style>
 :root {
@@ -276,7 +276,7 @@ textarea {
     <header class="topbar">
         <div>
             <a class="back" href="../../" id="back-link">Back to portfolio</a>
-            <h1 id="page-title">Rails Support Desk Demo</h1>
+            <h1 id="page-title">Ticket Management Live Demo</h1>
             <p class="subtitle" id="subtitle">A working browser version of the Rails CRUD project. Add tickets, edit status or priority, filter the queue and delete records. Data is saved locally in this browser.</p>
         </div>
         <div class="top-actions">
@@ -290,7 +290,7 @@ textarea {
                     PT
                 </button>
             </div>
-            <a class="button" href="https://github.com/tiagobarbosatech/tiagobarbosatech.github.io/tree/main/projects/rails-support-desk-demo" target="_blank" rel="noreferrer" id="source-link">Source code</a>
+            <a class="button" href="https://github.com/tiagobarbosatech/tiagobarbosatech.github.io/tree/main/projects/ticket-management-live-demo" target="_blank" rel="noreferrer" id="source-link">Source code</a>
         </div>
     </header>
 
@@ -334,8 +334,8 @@ textarea {
 </main>
 
 <script>
-const STORAGE_KEY = "rails-support-desk-demo:tickets";
-const LANGUAGE_KEY = "rails-support-desk-demo:language";
+const STORAGE_KEY = "ticket-management-live-demo:tickets";
+const LANGUAGE_KEY = "ticket-management-live-demo:language";
 const statuses = ["open", "in_progress", "resolved", "closed"];
 const priorities = ["low", "normal", "high", "urgent"];
 let currentFilter = "all";
@@ -376,9 +376,9 @@ const seedTickets = [
 
 const content = {
     en: {
-        documentTitle: "Rails Support Desk Demo",
+        documentTitle: "Ticket Management Live Demo",
         back: "Back to portfolio",
-        title: "Rails Support Desk Demo",
+        title: "Ticket Management Live Demo",
         subtitle: "A working browser version of the Rails CRUD project. Add tickets, edit status or priority, filter the queue and delete records. Data is saved locally in this browser.",
         source: "Source code",
         reset: "Reset demo data",
@@ -436,9 +436,9 @@ const content = {
         }
     },
     pt: {
-        documentTitle: "Demo Rails de Suporte",
+        documentTitle: "Demo de Gerenciamento de Tickets",
         back: "Voltar ao portfólio",
-        title: "Demo Rails de Suporte",
+        title: "Demo de Gerenciamento de Tickets",
         subtitle: "Uma versão funcional no navegador do projeto CRUD em Rails. Crie tickets, edite status ou prioridade, filtre a fila e exclua registros. Os dados ficam salvos localmente neste navegador.",
         source: "Código fonte",
         reset: "Restaurar dados da demo",

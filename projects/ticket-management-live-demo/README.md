@@ -1,4 +1,4 @@
-# Rails Support Desk Demo
+# Ticket Management Live Demo
 
 A small Ruby on Rails CRUD demo for a portfolio project. The app manages support tickets with priorities, statuses, validations, filtering, flash messages, and seed data.
 
