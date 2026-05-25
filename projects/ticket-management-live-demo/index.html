@@ -247,10 +247,24 @@ h1 {
 }
 
 .stat {
+    width: 100%;
+    text-align: left;
     background: var(--surface);
     border: 1px solid var(--line);
     border-radius: 8px;
     padding: 16px;
+    cursor: pointer;
+    color: var(--text);
+}
+
+.stat:hover,
+.stat.active {
+    border-color: var(--accent);
+    box-shadow: var(--shadow);
+}
+
+.stat.active {
+    background: #f0f9ff;
 }
 
 .stat span {
@@ -740,7 +754,7 @@ const content = {
             open: "Open",
             in_progress: "In progress",
             resolved: "Resolved",
-            urgent: "Urgent"
+            closed: "Closed"
         },
         statuses: {
             open: "Open",
@@ -828,7 +842,7 @@ const content = {
             open: "Abertos",
             in_progress: "Em andamento",
             resolved: "Resolvidos",
-            urgent: "Urgentes"
+            closed: "Fechados"
         },
         statuses: {
             open: "Aberto",
@@ -1000,13 +1014,13 @@ function renderStats() {
         ["open", ticketCounts.open],
         ["in_progress", ticketCounts.in_progress],
         ["resolved", ticketCounts.resolved],
-        ["urgent", ticketCounts.urgent]
+        ["closed", ticketCounts.closed]
     ];
     document.getElementById("stats").innerHTML = stats.map(([key, value]) => `
-        <article class="stat">
+        <button class="stat${currentFilter === key ? " active" : ""}" type="button" data-filter="${key}">
             <span>${t().stats[key]}</span>
             <strong>${value}</strong>
-        </article>
+        </button>
     `).join("");
 }
 
@@ -1195,6 +1209,12 @@ document.getElementById("reset-button").addEventListener("click", () => {
     showNotice(t().notices.restored);
 });
 document.getElementById("filters").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-filter]");
+    if (!button) return;
+    currentFilter = button.dataset.filter;
+    renderAll();
+});
+document.getElementById("stats").addEventListener("click", (event) => {
     const button = event.target.closest("[data-filter]");
     if (!button) return;
     currentFilter = button.dataset.filter;
